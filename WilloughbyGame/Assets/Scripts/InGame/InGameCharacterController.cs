@@ -32,6 +32,8 @@ public class InGameCharacterController : MonoBehaviour {
     {
          while(true)
         {
+            yield return new WaitUntil(() => InGameManager.Instance != null && InGameManager.Instance.Character != null);
+
             InGameManager.Instance.Character.Position += InGameManager.Instance.Character.Speed * 0.01f;
             yield return new WaitForSeconds(0.01f);
         }
