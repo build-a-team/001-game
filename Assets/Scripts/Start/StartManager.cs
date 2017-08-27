@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 public class StartManager : MonoBehaviour {
 
@@ -19,13 +21,17 @@ public class StartManager : MonoBehaviour {
 	private string strWeather = "";
 	private string strEmogi = "";
 
-
 	// Use this for initialization
 	void Start () {
-		ChangeGamewayPanel( false );
+		// ChangeGamewayPanel( false );
 	}
 	
 	public void ChangeGamewayPanel( bool b ) {
+		if ( b ) {
+			SoundManager.instance.playSound(1);
+		} else {
+			SoundManager.instance.playSound(2);
+		}
 		_wayPanel.SetActive(b);
 	}
 
@@ -37,14 +43,19 @@ public class StartManager : MonoBehaviour {
 			DataManager.instance.weather = strWeather;
 			DataManager.instance.mood = strEmogi;
 
-			DataManager.instance.StartCoroutine("ParseCoroutine");
-
+			// DataManager.instance.StartCoroutine("ParseCoroutine");
+			
+			SceneManager.UnloadScene("Start");
+			SceneManager.LoadScene("UI");
+			SceneManager.LoadSceneAsync("InGame", LoadSceneMode.Additive);
 			return;
 		}
 
 		initArray("Weathers", _weatherList);
 
 		_stepPanels[ nStep ].SetActive( true );
+
+		SoundManager.instance.playSound(1);
 	}
 
 	public void initArray(string str, List<GameObject> goList) {
@@ -65,6 +76,8 @@ public class StartManager : MonoBehaviour {
 	}
 
 	public void ChangeArray(bool b) {
+
+		SoundManager.instance.playSound(0);
 
 		int maxCount = nStep==0 ? 3 : 6;
 
@@ -89,6 +102,8 @@ public class StartManager : MonoBehaviour {
 	}
 
 	public void ChoiceWeather(int idx) {
+		SoundManager.instance.playSound(1);
+
 		int nWeather = nIndex + idx;
 
 		switch (nWeather) {
@@ -109,12 +124,14 @@ public class StartManager : MonoBehaviour {
 				break;
 		}
 
+		_stepPanels[ nStep ].SetActive( false );
 		nStep++;
 		_stepPanels[ nStep ].SetActive( true );
 		initArray("Emojis", _emogiList);
 	}
 
 	public void ChoiceEmogi(int idx) {
+		SoundManager.instance.playSound(1);
 		int nEmogi = nIndex + idx;
 
 		switch (nEmogi) {

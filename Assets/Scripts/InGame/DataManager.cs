@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using GameData;
-using UnityEngine.SceneManagement;
 
 public class DataManager : MonoBehaviour {
 
@@ -11,12 +10,14 @@ public class DataManager : MonoBehaviour {
 	public string mood = "";
 	public string weather = "";
 
+
 	void Awake()
 	{
 		if ( instance == null )
 			instance = this;
 		else if ( instance != this )
 			Destroy(this);
+
 	}
 
 	public IEnumerator ParseCoroutine() {
@@ -34,19 +35,27 @@ public class DataManager : MonoBehaviour {
 			int nMax = 0;
 			int nIndex = 0;
 
-			Dictionary<string, object> dictData = MiniJSON.jsonDecode(www.text) as Dictionary<string, object>;
+			List<object> listArray = MiniJSON.jsonDecode(www.text) as List<object>;
+			// Dictionary<string, object> dictData = listArray["track"] as Dictionary<string, object>;
 
-			List<object> trackData = dictData["track"] as List<object>;
+			// List<object> trackData = dictData["track"] as List<object>;
+			// Debug.Log(listArray.Count);
 
-			for(int i = 0; i < trackData.Count; i++) {
+			for(int i = 0; i < listArray.Count; i++) {
 
-				Dictionary<string, object> dicData = trackData[i] as Dictionary<string, object>;
+				Dictionary<string, object> dicData = listArray[i] as Dictionary<string, object>;
+			// 	Debug.Log(dicData.Count);
 
-				int nDownloadCount = int.Parse(dicData["playback_count"]+"");
-				if ( nDownloadCount >= nMax ) {
-					nMax = nDownloadCount;
-					nIndex = i;
-				}
+				// for (int j = 0; j < dicData.Count; j++) {
+				// 	Dictionary<string, object> dictData = dicData["track"] as Dictionary<string, object>;	
+				// 	Debug.Log(dicData.Values);		
+				// }
+
+				// int nDownloadCount = int.Parse(dicData["playback_count"]+"");
+				// if ( nDownloadCount >= nMax ) {
+				// 	nMax = nDownloadCount;
+				// 	nIndex = i;
+				// }
 			}
 
 			// Dictionary<string, object> data = trackData[nIndex] as Dictionary<string, object>;
@@ -70,17 +79,8 @@ public class DataManager : MonoBehaviour {
 		Debug.Log("Download over");
 		// System.IO.File.WriteAllBytes(Application.dataPath + "/../Assets/Ressources/audio1.wav", www.bytes);
 
-
-
-		SceneManager.UnloadScene("Start");
-		SceneManager.LoadScene("UI");
-		SceneManager.LoadSceneAsync("InGame", LoadSceneMode.Additive);
-
 	}
 
-	public void sendTmp() {
+	
 
-		Debug.Log("Hi");
-
-	}
 }

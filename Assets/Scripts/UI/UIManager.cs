@@ -34,6 +34,8 @@ public class UIManager : MonoBehaviour {
 
 	public void Jump()
     {
+        SoundManager.instance.playSound(0);
+
         InGameManager.Instance.JumpButtonPress();
     }
 
@@ -70,6 +72,7 @@ public class UIManager : MonoBehaviour {
 
     public void GameStop(bool bIsOn)
     {
+        SoundManager.instance.playSound(0);
         Time.timeScale = Time.timeScale == 1 ? 0 : 1;
     }
 
