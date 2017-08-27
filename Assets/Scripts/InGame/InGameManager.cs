@@ -12,21 +12,28 @@ public class InGameManager : MonoBehaviour
     void Awake()
     {
         if (Instance == null)
+        {
             Instance = this;
+            Init();
+        }
         else
             Destroy(this.gameObject);
     }
 
-    void Start()
+    void Init()
     {
         m_characterController = GameObject.FindObjectOfType<InGameCharacterController>();
 
-        Character = new CharacterVO(1, 5, 40, 0);
+        Character = InGameData.Instance.CharacterList.Find(a => a.Id == 1);
+        InGameData.Instance.Speed = Character.Speed;
+    }
+
+    void Start()
+    {
         
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 200; i++)
         {
             int n = Random.Range(0, 4) + 1;
-            Debug.Log(n + " :: " + InGameData.Instance);
             ObstacleVO obstacle = InGameData.Instance.ObstacleList.Find(a => a.Type == n).Copy();
             obstacle.SetCreatePosition(2000 + (i * Random.Range(0, 5) * 60));
             ObstacleList.Add(obstacle);
@@ -46,10 +53,20 @@ public class InGameManager : MonoBehaviour
     public List<ObstacleVO> ObstacleList = new List<ObstacleVO>();
     private int m_nObstacleIdx = 0;
     public Queue<GameObject> ObstaclePool = new Queue<GameObject>();
-    
+
+    public int Score = 0;
 
     public CharacterVO Character;
     private InGameCharacterController m_characterController;
+
+    public delegate void CharacterHpChanged(int nChangeValue);
+    public event CharacterHpChanged OnCharacterHpChange;
+
+    public delegate void ItemGet(int nItemType);
+    public event ItemGet OnItemGet;
+
+    public delegate void JumpButtonPressed();
+    public event JumpButtonPressed OnJumpButtonPressed;
 
     /// //////////////////////////////////////////////////
     /// Method
@@ -104,5 +121,53 @@ public class InGameManager : MonoBehaviour
     {
         obj.SetActive(false);
         ObstaclePool.Enqueue(obj);
+    }
+
+    private IEnumerator ItemCreateRoutine()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(10.0f);
+
+            int nVal = Random.Range(0, 5);
+            if (nVal == 0)
+                CreateItem();
+        }
+    }
+
+    public void CreateItem()
+    {
+        GameObject item = InGameData.Instance.ItemPrefabList[Random.Range(0, 3)];
+        item = Instantiate<GameObject>(item);
+
+        Transform trnf = GameObject.Find("InGameCanvas").transform;
+        item.transform.SetParent(trnf);
+        item.transform.SetSiblingIndex(4);
+        item.transform.localScale = new Vector3(1, 1, 1);
+        item.transform.localPosition = new Vector3(2500, Random.Range(60, 300), 0);
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    /// 
+
+    public void CharacterHpChange(int nChangeValue)
+    {
+        if(OnCharacterHpChange != null)
+        {
+            OnCharacterHpChange(nChangeValue);
+        }
+    }
+
+    public void ItemAcquire(int nType)
+    {
+        Score += InGameData.Instance.ItemList.Find(a => a.Type == nType).Score;
+        if (OnItemGet != null)
+            OnItemGet(Score);
+    }
+
+    public void JumpButtonPress()
+    {
+        if (OnJumpButtonPressed != null)
+            OnJumpButtonPressed();
     }
 }

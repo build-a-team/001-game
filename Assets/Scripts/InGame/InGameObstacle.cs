@@ -9,6 +9,7 @@ public class InGameObstacle : MonoBehaviour
     private DOTweenAnimation m_dtSpecialEvent;
     private ObstacleVO obstacle;
     private Image m_img;
+    private bool m_bUp = false;
 	// Use this for initialization
 
     void OnEnable()
@@ -17,17 +18,23 @@ public class InGameObstacle : MonoBehaviour
             m_dtMove = GetComponent<DOTweenAnimation>();
 
         if (m_img == null)
-            m_img = GetComponent<Image>(); 
+            m_img = GetComponent<Image>();
+
+        
         //m_dtMove.tween.Restart();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if (obstacle.OnGround == true)
+        if (obstacle.Type == 2)
         {
-            if (transform.localPosition.x < -50)
+            if (transform.localPosition.x < -50 && m_bUp == false)
             {
+                Vector3 vc3 = transform.localPosition;
+                vc3.y += 80;
+                transform.localPosition = vc3;
+                m_bUp = true;
             }
         }
 
@@ -41,25 +48,44 @@ public class InGameObstacle : MonoBehaviour
     {
         obstacle = obstaclevo;
         m_img.sprite = InGameData.Instance.ObstacleSpriteList[obstaclevo.Type - 1];
-        m_dtMove.tween.Restart();
+        StartCoroutine(MoveRoutine());
 
-        if (obstacle.OnGround == false)
+        if (obstacle.Type == 2)
         {
-            m_dtMove.endValueV3.x += 200;
+            Vector3 vc3 = transform.localPosition;
+            vc3.y = -325;
+            transform.localPosition = vc3;
         }
-        else
+        else if (obstacle.Type != 1)
         {
-            if(obstacle.Type == 1)
-            {
-                RectTransform rttrnf = GetComponent<RectTransform>();
-                rttrnf.pivot = new Vector2(0.5f, 0);
+            Vector3 vc3 = transform.localPosition;
+            vc3.y = Random.Range(-140,140);
+            transform.localPosition = vc3;
+        }
+        else if(obstacle.Type == 1)
+        {
+            m_dtSpecialEvent = GetComponent<DOTweenAnimation>();
+            m_dtSpecialEvent.tween.Restart();
+        }
+    }
 
-                m_dtSpecialEvent = gameObject.AddComponent<DOTweenAnimation>();
-                m_dtSpecialEvent.animationType = DG.Tweening.Core.DOTweenAnimationType.LocalRotate;
-                m_dtSpecialEvent.loops = 100;
-                m_dtSpecialEvent.loopType = LoopType.Yoyo;
-                m_dtSpecialEvent.endValueV3 = new Vector3(0, 0, 30);
+    private IEnumerator MoveRoutine()
+    {
+        while(gameObject.activeInHierarchy)
+        {
+            yield return new WaitUntil(() => InGameData.Instance != null);
+
+            Vector3 vc3 = transform.localPosition;
+            vc3.x -= InGameData.Instance.Speed * 0.5f;
+
+            if (obstacle.Type == 3 || obstacle.Type == 4)
+            {
+                vc3.x -= 10;
             }
+
+            transform.localPosition = vc3;
+
+            yield return new WaitForSeconds(0.01f);
         }
     }
 }

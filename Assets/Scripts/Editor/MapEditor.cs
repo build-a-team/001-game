@@ -4,11 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 
 [CustomEditor(typeof(SceneGUI))]
+
+public class MapEditorObject
+{
+    public string Name;
+    public GameObject PrefabObject;
+}
+
 public class MapEditor : Editor
 {
     private bool m_bMapEditorMode = false;
     private List<GameObject> m_listCreateObj = new List<GameObject>();
-
+    private List<MapEditorObject> m_listEditorObj = new List<MapEditorObject>();
 
     private void OnSceneGUI()
     {

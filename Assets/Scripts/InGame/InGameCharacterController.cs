@@ -17,15 +17,8 @@ public class InGameCharacterController : MonoBehaviour {
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_img = GetComponent<Image>();
         StartCoroutine(CharacterMove());
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (m_nJumpCnt < 2 && Input.GetMouseButtonDown(0))
-        {
-            Jump();
-        }        
+        InGameManager.Instance.OnJumpButtonPressed += Jump;
     }
 
     private IEnumerator CharacterMove()
@@ -46,7 +39,10 @@ public class InGameCharacterController : MonoBehaviour {
 
     public void Jump()
     {
-        m_rigidbody.velocity = Vector2.up * 300;
+        if (m_nJumpCnt >= 2)
+            return;
+
+        m_rigidbody.velocity = Vector2.up * 13;
 
         m_nJumpCnt++;
         //m_dtJump.tween.Restart();
@@ -67,15 +63,39 @@ public class InGameCharacterController : MonoBehaviour {
     {
         if (m_bInvincible == false)
         {
+
             if (col.CompareTag("Obstacle"))
             {
-                InGameManager.Instance.Character.Hp--;
-                FlashImage();
+                float fVal = Random.Range(0.0f, 1.0f);
+
+                if (fVal > InGameManager.Instance.Character.Evade)
+                {
+                    InGameManager.Instance.Character.Hp--;
+                    FlashImage();
+                    InGameManager.Instance.CharacterHpChange(-1);
+                }
+                else
+                {
+                    FlashRed();
+                }
             }
         }
-        if (col.CompareTag("Item") || col.CompareTag("Gold"))
+        if (col.CompareTag("Item"))
         {
-
+            InGameItem item = col.GetComponent<InGameItem>();
+            InGameManager.Instance.ItemAcquire(item.Item.Type);
+            if(item.Item.HpUp)
+            {
+                if(InGameManager.Instance.Character.Hp < InGameManager.Instance.Character.MaxHp)
+                {
+                    InGameManager.Instance.Character.Hp++;
+                    InGameManager.Instance.CharacterHpChange(1);
+                }
+            }
+            if(item.Item.SpeedUp)
+            {
+                InGameData.Instance.Speed += 20;
+            }
         }
     }
     private void FlashImage()
@@ -103,6 +123,19 @@ public class InGameCharacterController : MonoBehaviour {
         m_img.CrossFadeAlpha(1.0f, 0.25f, false);
         yield return new WaitForSeconds(0.25f);
         m_bInvincible = false;
+    }
+
+    private void FlashRed()
+    {
+        StartCoroutine(FlashRedRoutine());
+    }
+
+    private IEnumerator FlashRedRoutine()
+    {
+        m_img.CrossFadeColor(Color.red, 0.5f, false, false);
+        yield return new WaitForSeconds(0.25f);
+        m_img.CrossFadeColor(Color.white, 0.5f, false, false);
+        yield return new WaitForSeconds(0.25f);
     }
     
 }
