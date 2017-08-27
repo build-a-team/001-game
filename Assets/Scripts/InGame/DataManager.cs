@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using GameData;
+using UnityEngine.SceneManagement;
 
 public class DataManager : MonoBehaviour {
 
 	public static DataManager instance = null;
 
-	private string mood = "happy";
-	private string weather = "rainy";
+	public string mood = "";
+	public string weather = "";
 
 	void Awake()
 	{
@@ -18,14 +19,11 @@ public class DataManager : MonoBehaviour {
 			Destroy(this);
 	}
 
-	void Start () {
-	
-		StartCoroutine( "ParseCoroutine" );
-	}
+	public IEnumerator ParseCoroutine() {
 
-	IEnumerator ParseCoroutine() {
+		string url = "https://91igu4dgel.execute-api.ap-northeast-2.amazonaws.com/prod/tracks/suggestions?mood="+mood+"&weather="+weather+"&count=20";
 
-		string url = "https://91igu4dgel.execute-api.ap-northeast-2.amazonaws.com/prod/tracks";
+		Debug.Log(url);
 
 		WWWForm form = new WWWForm();
 		WWW www = new WWW(url);
@@ -36,26 +34,28 @@ public class DataManager : MonoBehaviour {
 			int nMax = 0;
 			int nIndex = 0;
 
-			List<object> listData = MiniJSON.jsonDecode(www.text) as List<object>;
+			Dictionary<string, object> dictData = MiniJSON.jsonDecode(www.text) as Dictionary<string, object>;
 
-			for(int i = 0; i < listData.Count; i++) {
+			List<object> trackData = dictData["track"] as List<object>;
 
-				Dictionary<string, object> dicData = listData[i] as Dictionary<string, object>;
+			for(int i = 0; i < trackData.Count; i++) {
 
-				int nDownloadCount = int.Parse(dicData["download_count"]+"");
+				Dictionary<string, object> dicData = trackData[i] as Dictionary<string, object>;
+
+				int nDownloadCount = int.Parse(dicData["playback_count"]+"");
 				if ( nDownloadCount >= nMax ) {
 					nMax = nDownloadCount;
 					nIndex = i;
 				}
 			}
 
-			Dictionary<string, object> data = listData[nIndex] as Dictionary<string, object>;
+			// Dictionary<string, object> data = trackData[nIndex] as Dictionary<string, object>;
 
-			Debug.Log( "최고점수 : " + nMax );
-			Debug.Log( "노래제목 : " + data["title"] );
-			Debug.Log( "노래제목 : " + data["download_url"] );
+			// Debug.Log( "최고점수 : " + nMax );
+			// Debug.Log( "노래제목 : " + data["title"] );
+			// Debug.Log( "노래제목 : " + data["download_url"] );
 
-			StartCoroutine("downloadMusic", data["download_url"]);
+			// StartCoroutine("downloadMusic", data["download_url"]);
 
 		} else {
 			Debug.Log( www.error );
@@ -68,7 +68,14 @@ public class DataManager : MonoBehaviour {
 		yield return www;
 		AudioClip audiolist=www.audioClip;
 		Debug.Log("Download over");
-		System.IO.File.WriteAllBytes(Application.dataPath + "/../Assets/Ressources/audio1.wav", www.bytes);
+		// System.IO.File.WriteAllBytes(Application.dataPath + "/../Assets/Ressources/audio1.wav", www.bytes);
+
+
+
+		SceneManager.UnloadScene("Start");
+		SceneManager.LoadScene("UI");
+		SceneManager.LoadSceneAsync("InGame", LoadSceneMode.Additive);
+
 	}
 
 	public void sendTmp() {
