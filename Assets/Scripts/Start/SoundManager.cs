@@ -6,7 +6,8 @@ public class SoundManager : MonoBehaviour {
 	public static SoundManager instance = null;
 
 	public AudioClip[] clips;
-	private AudioSource audioSource;
+	public AudioSource audioSource;
+	public AudioSource effSource;
 
 	void Awake()
 	{
@@ -16,10 +17,15 @@ public class SoundManager : MonoBehaviour {
 			Destroy(this);
 
 		DontDestroyOnLoad(gameObject);
-		audioSource = GetComponent<AudioSource>();
 	}
 
-	public void playSound(int type) {
-		audioSource.PlayOneShot(clips[type]);
+	public void PlaySound(int type) {
+		if (type == 1) {
+			audioSource.PlayOneShot(clips[0]);
+			effSource.PlayScheduled(5000);
+		}
+		else {
+			audioSource.PlayOneShot(clips[type]);
+		}
 	}
 }

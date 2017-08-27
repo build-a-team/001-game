@@ -16,6 +16,8 @@ public class UIManager : MonoBehaviour {
     [SerializeField]
     private Sprite m_sprtCharacter2;
 
+    private bool isPlaying = true;
+
     // Use this for initialization
     void Start ()
     {
@@ -39,7 +41,7 @@ public class UIManager : MonoBehaviour {
 
 	public void Jump()
     {
-        SoundManager.instance.playSound(0);
+        SoundManager.instance.PlaySound(0);
 
         InGameManager.Instance.JumpButtonPress();
     }
@@ -77,7 +79,14 @@ public class UIManager : MonoBehaviour {
 
     public void GameStop(bool bIsOn)
     {
-        SoundManager.instance.playSound(0);
+        isPlaying = !isPlaying;
+        if ( isPlaying ) {
+            InGameManager.Instance.audioSource.Play();
+        } else {
+            InGameManager.Instance.audioSource.Pause();
+        }
+
+        SoundManager.instance.PlaySound(0);
         Time.timeScale = Time.timeScale == 1 ? 0 : 1;
     }
 

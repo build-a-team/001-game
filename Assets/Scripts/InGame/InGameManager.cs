@@ -25,6 +25,9 @@ public class InGameManager : MonoBehaviour
         m_characterController = GameObject.FindObjectOfType<InGameCharacterController>();
 
         StartCoroutine(InitRoutine());
+
+        audioSource = GetComponent<AudioSource>();
+        audioSource.Play();
     }
 
     private IEnumerator InitRoutine()
@@ -52,6 +55,8 @@ public class InGameManager : MonoBehaviour
         
     }
 
+  
+
     /// //////////////////////////////////////////////////
     /// Field
     /// 
@@ -76,6 +81,8 @@ public class InGameManager : MonoBehaviour
 
     public delegate void JumpButtonPressed();
     public event JumpButtonPressed OnJumpButtonPressed;
+
+    public AudioSource audioSource;
 
     /// //////////////////////////////////////////////////
     /// Method
@@ -179,4 +186,5 @@ public class InGameManager : MonoBehaviour
         if (OnJumpButtonPressed != null)
             OnJumpButtonPressed();
     }
+
 }

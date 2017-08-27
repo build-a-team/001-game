@@ -28,9 +28,9 @@ public class StartManager : MonoBehaviour {
 	
 	public void ChangeGamewayPanel( bool b ) {
 		if ( b ) {
-			SoundManager.instance.playSound(1);
+			SoundManager.instance.PlaySound(1);
 		} else {
-			SoundManager.instance.playSound(2);
+			SoundManager.instance.PlaySound(2);
 		}
 		_wayPanel.SetActive(b);
 	}
@@ -55,7 +55,7 @@ public class StartManager : MonoBehaviour {
 
 		_stepPanels[ nStep ].SetActive( true );
 
-		SoundManager.instance.playSound(1);
+		SoundManager.instance.PlaySound(1);
 	}
 
 	public void initArray(string str, List<GameObject> goList) {
@@ -77,7 +77,7 @@ public class StartManager : MonoBehaviour {
 
 	public void ChangeArray(bool b) {
 
-		SoundManager.instance.playSound(0);
+		SoundManager.instance.PlaySound(0);
 
 		int maxCount = nStep==0 ? 3 : 6;
 
@@ -102,7 +102,7 @@ public class StartManager : MonoBehaviour {
 	}
 
 	public void ChoiceWeather(int idx) {
-		SoundManager.instance.playSound(1);
+		SoundManager.instance.PlaySound(1);
 
 		int nWeather = nIndex + idx;
 
@@ -131,7 +131,7 @@ public class StartManager : MonoBehaviour {
 	}
 
 	public void ChoiceEmogi(int idx) {
-		SoundManager.instance.playSound(1);
+		SoundManager.instance.PlaySound(1);
 		int nEmogi = nIndex + idx;
 
 		switch (nEmogi) {
