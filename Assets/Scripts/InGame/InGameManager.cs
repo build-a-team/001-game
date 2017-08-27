@@ -22,8 +22,7 @@ public class InGameManager : MonoBehaviour
 
     void Init()
     {
-        m_characterController = GameObject.FindObjectOfType<InGameCharacterController>();
-
+        
         StartCoroutine(InitRoutine());
 
         audioSource = GetComponent<AudioSource>();
@@ -34,7 +33,20 @@ public class InGameManager : MonoBehaviour
     {
         yield return new WaitUntil(() => InGameData.Instance != null && InGameData.Instance.CharacterList.Count != 0);
 
-        Character = InGameData.Instance.CharacterList.Find(a => a.Id == 1);
+        bool bCharacterId = DataManager.instance.mood == "angry" || DataManager.instance.mood == "sad";
+        int nCharacterId = bCharacterId ? 2 : 1;
+        
+        Character = InGameData.Instance.CharacterList.Find(a =>a.Id == nCharacterId);
+
+        if(nCharacterId == 2)
+        {
+            GameObject obj = GameObject.Find("Character_1");
+            obj.SetActive(false);
+            obj.transform.parent.FindChild("Character_2").gameObject.SetActive(true);;
+        }
+
+        m_characterController = GameObject.FindObjectOfType<InGameCharacterController>();
+
         InGameData.Instance.Speed = Character.Speed;
         CharacterHpChange(0);
         CreateObstaclePool();
