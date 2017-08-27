@@ -27,8 +27,13 @@ public class UIManager : MonoBehaviour {
         m_imgFace = trnfTop.GetChild(0).GetComponent<Image>();
 
         ScoreUp(0);
-        ChangeHp(0);
-        ChangeFace(InGameManager.Instance.Character.Id); 
+        
+    }
+
+    private IEnumerator SetFace()
+    {
+        yield return new WaitUntil(() => InGameManager.Instance != null && InGameManager.Instance.Character != null);
+        ChangeFace(InGameManager.Instance.Character.Id);
     }
 
 

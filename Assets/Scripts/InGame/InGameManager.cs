@@ -24,8 +24,17 @@ public class InGameManager : MonoBehaviour
     {
         m_characterController = GameObject.FindObjectOfType<InGameCharacterController>();
 
+        StartCoroutine(InitRoutine());
+    }
+
+    private IEnumerator InitRoutine()
+    {
+        yield return new WaitUntil(() => InGameData.Instance != null && InGameData.Instance.CharacterList.Count != 0);
+
         Character = InGameData.Instance.CharacterList.Find(a => a.Id == 1);
         InGameData.Instance.Speed = Character.Speed;
+        CharacterHpChange(0);
+        CreateObstaclePool();
     }
 
     void Start()
@@ -40,7 +49,7 @@ public class InGameManager : MonoBehaviour
             
 
         }
-        CreateObstaclePool();
+        
     }
 
     /// //////////////////////////////////////////////////

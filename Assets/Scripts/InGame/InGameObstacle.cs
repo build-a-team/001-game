@@ -27,6 +27,9 @@ public class InGameObstacle : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
+        if (obstacle == null)
+            return;
+
         if (obstacle.Type == 2)
         {
             if (transform.localPosition.x < -50 && m_bUp == false)
